@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AdD KELİME - Türkçe rekabetçi kelime bulmaca oyunu. Günlük kelimeyi bul, sıralamada yüksel!">
+  <title>AdD KELİME - Türkçe Kelime Oyunu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="screen active">
+      <div class="auth-container">
+        <div class="logo-section">
+          <h1 class="logo">AdD <span class="highlight">KELİME</span></h1>
+          <p class="tagline">Türkçe Rekabetçi Kelime Oyunu</p>
+        </div>
+        
+        <div class="auth-card glass-card">
+          <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Giriş Yap</button>
+            <button class="auth-tab" data-tab="register">Kayıt Ol</button>
+          </div>
+          
+          <!-- Login Form -->
+          <form id="login-form" class="auth-form active">
+            <div class="form-group">
+              <label for="login-email">E-posta</label>
+              <input type="email" id="login-email" placeholder="ornek@email.com" required>
+            </div>
+            <div class="form-group">
+              <label for="login-password">Şifre</label>
+              <input type="password" id="login-password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Giriş Yap</button>
+            <div id="login-error" class="error-message"></div>
+          </form>
+          
+          <!-- Register Form -->
+          <form id="register-form" class="auth-form">
+            <div class="form-group">
+              <label for="register-name">Kullanıcı Adı</label>
+              <input type="text" id="register-name" placeholder="Kullanıcı adınız" required>
+            </div>
+            <div class="form-group">
+              <label for="register-email">E-posta</label>
+              <input type="email" id="register-email" placeholder="ornek@email.com" required>
+            </div>
+            <div class="form-group">
+              <label for="register-password">Şifre</label>
+              <input type="password" id="register-password" placeholder="En az 6 karakter" required minlength="6">
+            </div>
+            <button type="submit" class="btn btn-primary">Kayıt Ol</button>
+            <div id="register-error" class="error-message"></div>
+            <div id="register-success" class="success-message"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-left">
+          <h1 class="header-logo">AdD <span class="highlight">KELİME</span></h1>
+        </div>
+        <div class="header-center">
+          <div class="mode-selector">
+            <button class="mode-btn active" data-mode="5">5 Harf</button>
+            <button class="mode-btn" data-mode="6">6 Harf</button>
+            <button class="mode-btn" data-mode="7">7 Harf</button>
+          </div>
+        </div>
+        <div class="header-right">
+          <button id="leaderboard-btn" class="icon-btn" title="Liderlik Tablosu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 21V11M16 21V7M12 21V16M12 3v4M4 7h16"></path>
+            </svg>
+          </button>
+          <div class="user-menu">
+            <span id="user-name" class="user-name"></span>
+            <button id="logout-btn" class="btn btn-ghost btn-sm">Çıkış</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Game Area -->
+      <main class="game-main">
+        <!-- Timer -->
+        <div class="timer-section">
+          <div class="timer glass-card">
+            <span class="timer-icon">⏱️</span>
+            <span id="timer" class="timer-value">00:00.000</span>
+          </div>
+        </div>
+
+        <!-- Game Board -->
+        <div id="game-board" class="game-board">
+          <!-- Rows will be generated dynamically -->
+        </div>
+
+        <!-- Message Area -->
+        <div id="message-area" class="message-area"></div>
+
+        <!-- Keyboard -->
+        <div id="keyboard" class="keyboard">
+          <!-- Keyboard will be generated dynamically -->
+        </div>
+      </main>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal">
+      <div class="modal-overlay"></div>
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <h2>🏆 Liderlik Tablosu</h2>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="leaderboard-tabs">
+          <button class="lb-tab active" data-period="daily">Günlük</button>
+          <button class="lb-tab" data-period="monthly">Aylık</button>
+        </div>
+        <div class="leaderboard-mode-tabs">
+          <button class="lb-mode-tab active" data-mode="5">5 Harf</button>
+          <button class="lb-mode-tab" data-mode="6">6 Harf</button>
+          <button class="lb-mode-tab" data-mode="7">7 Harf</button>
+        </div>
+        <div id="leaderboard-content" class="leaderboard-content">
+          <!-- Leaderboard data will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="modal">
+      <div class="modal-overlay"></div>
+      <div class="modal-content glass-card result-modal-content">
+        <div id="result-icon" class="result-icon"></div>
+        <h2 id="result-title" class="result-title"></h2>
+        <p id="result-word" class="result-word"></p>
+        <div class="result-stats">
+          <div class="stat">
+            <span class="stat-value" id="result-attempts"></span>
+            <span class="stat-label">Deneme</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="result-time"></span>
+            <span class="stat-label">Süre</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="result-rank"></span>
+            <span class="stat-label">Sıralama</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="result-points"></span>
+            <span class="stat-label">Puan</span>
+          </div>
+        </div>
+        <button id="result-close" class="btn btn-primary">Tamam</button>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
