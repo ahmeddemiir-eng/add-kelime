@@ -100,7 +100,7 @@ export async function getDailyLeaderboard(gameMode, limit = 10, dateStr = null) 
       `)
             .eq('game_mode', gameMode)
             .eq('game_date', today)
-            .gt('created_at', '2026-01-03T01:50:00Z') // Correct UTC time for cleanup (04:50 Turkey Time)
+            .gt('created_at', '2026-01-03T00:00:00Z') // Safer filter to include recent games but exclude old ones
             .order('won', { ascending: false })
             .order('time_ms', { ascending: true })
             .limit(limit)
@@ -109,9 +109,8 @@ export async function getDailyLeaderboard(gameMode, limit = 10, dateStr = null) 
 
         // Calculate points for each player
         return data.map((result, index) => {
-            let username = 'Anonim'
+            let username = 'Oyuncu'
             if (result.profiles) {
-                // Handle both object and array formats from Supabase
                 const profile = Array.isArray(result.profiles) ? result.profiles[0] : result.profiles
                 username = profile?.username || 'Oyuncu'
             }
@@ -151,7 +150,7 @@ export async function getMonthlyLeaderboard(gameMode, limit = 10) {
             .eq('game_mode', gameMode)
             .gte('game_date', startDate)
             .lte('game_date', endDate)
-            .gt('created_at', '2026-01-03T01:50:00Z')
+            .gt('created_at', '2026-01-03T00:00:00Z')
             .order('game_date')
             .order('won', { ascending: false })
             .order('time_ms', { ascending: true })
@@ -219,7 +218,7 @@ export async function getAllTimeLeaderboard(gameMode, limit = 10) {
         profiles(username)
       `)
             .eq('game_mode', gameMode)
-            .gt('created_at', '2026-01-03T01:50:00Z')
+            .gt('created_at', '2026-01-03T00:00:00Z')
             .order('game_date')
             .order('won', { ascending: false })
             .order('time_ms', { ascending: true })
@@ -286,7 +285,7 @@ export async function hasPlayedToday(gameMode) {
             .eq('user_id', user.id)
             .eq('game_mode', gameMode)
             .eq('game_date', today)
-            .gt('created_at', '2026-01-03T01:50:00Z')
+            .gt('created_at', '2026-01-03T00:00:00Z')
             .single()
 
         return !!data
@@ -309,7 +308,7 @@ export async function getTodayResult(gameMode) {
             .eq('user_id', user.id)
             .eq('game_mode', gameMode)
             .eq('game_date', today)
-            .gt('created_at', '2026-01-03T01:50:00Z')
+            .gt('created_at', '2026-01-03T00:00:00Z')
             .single()
 
         return data
