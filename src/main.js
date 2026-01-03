@@ -38,6 +38,7 @@ const leaderboardContent = document.getElementById('leaderboard-content')
 const resultModal = document.getElementById('result-modal')
 const liveTickerContent = document.getElementById('live-ticker-content')
 const leaderboardDateInput = document.getElementById('leaderboard-date')
+const dailyLeaderboardContent = document.getElementById('daily-leaderboard-content')
 
 // Initialize the application
 async function init() {
@@ -93,11 +94,38 @@ function startRealtimeUpdates() {
 
         liveTickerContent.prepend(item)
 
+        // Refresh daily leaderboard if it s for the current mode
+        if (scoreData.gameMode === currentMode) {
+            loadDailyTop5(currentMode)
+        }
+
         // Remove old items if too many
         if (liveTickerContent.children.length > 10) {
             liveTickerContent.lastElementChild.remove()
         }
     })
+}
+
+async function loadDailyTop5(mode) {
+    const data = await getDailyLeaderboard(mode, 5)
+
+    if (data.length === 0) {
+        dailyLeaderboardContent.innerHTML = '<div class="leaderboard-empty">Henüz sonuç yok</div>'
+        return
+    }
+
+    const currentUser = getCurrentUser()
+
+    dailyLeaderboardContent.innerHTML = data.map((item, index) => {
+        const isSelf = currentUser && item.userId === currentUser.id
+        return `
+            <div class="leaderboard-item-mini ${isSelf ? 'self' : ''}">
+                <span class="rank">${index + 1}</span>
+                <span class="name">${item.username}</span>
+                <span class="score">${formatTime(item.timeMs)}</span>
+            </div>
+        `
+    }).join('')
 }
 
 function setupAuthTabs() {
@@ -243,13 +271,15 @@ function startGame(mode) {
     renderKeyboard()
     timerEl.textContent = '00:00.000'
     messageArea.innerHTML = ''
+    loadDailyTop5(mode)
 }
 
 async function showPreviousResult(mode) {
     // Get player's previous result and show it
     const rank = await getPlayerRank(mode)
+    loadDailyTop5(mode)
     if (rank) {
-        showMessage(`Bugünkü sıralamanız: #${rank}`, 'success')
+        showMessage(`Bu modu zaten oynadınız. Bugünkü sıralamanız: #${rank}`, 'success')
     }
 }
 
@@ -413,6 +443,9 @@ async function handleSubmit() {
         if (saveResult.error && !saveResult.error.includes('zaten')) {
             console.error('Save error:', saveResult.error)
         }
+
+        // Refresh side leaderboard
+        loadDailyTop5(currentMode)
 
         // Get rank
         const rank = await getPlayerRank(currentMode)

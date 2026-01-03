@@ -101,7 +101,7 @@ export async function getDailyLeaderboard(gameMode, limit = 10, dateStr = null) 
         won,
         attempts,
         time_ms,
-        profiles!inner(username)
+        profiles(username)
       `)
             .eq('game_mode', gameMode)
             .eq('game_date', today)
@@ -142,7 +142,7 @@ export async function getMonthlyLeaderboard(gameMode, limit = 10) {
         won,
         time_ms,
         game_date,
-        profiles!inner(username)
+        profiles(username)
       `)
             .eq('game_mode', gameMode)
             .gte('game_date', startDate)
@@ -206,7 +206,7 @@ export async function getAllTimeLeaderboard(gameMode, limit = 10) {
         won,
         time_ms,
         game_date,
-        profiles!inner(username)
+        profiles(username)
       `)
             .eq('game_mode', gameMode)
             .order('game_date')

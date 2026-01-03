@@ -392,17 +392,79 @@ body::before {
   font-size: 0.875rem;
 }
 
-/* ===== Game Main ===== */
+/* ===== Game Screen Layout ===== */
+#game-screen {
+  display: none;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-2xl);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#game-screen.active {
+  display: flex;
+}
+
 .game-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-lg);
   gap: var(--spacing-lg);
-  max-width: 600px;
-  margin: 0 auto;
-  width: 100%;
+  max-width: 500px;
+}
+
+.side-panel {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  position: sticky;
+  top: var(--spacing-xl);
+}
+
+.side-card {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.side-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: var(--spacing-sm);
+}
+
+.side-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+@media (max-width: 1000px) {
+  #game-screen {
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-md);
+    gap: var(--spacing-lg);
+  }
+
+  .side-panel {
+    width: 100%;
+    position: static;
+    order: 2;
+  }
+
+  .game-main {
+    order: 1;
+    width: 100%;
+  }
 }
 
 /* ===== Timer ===== */
@@ -789,6 +851,39 @@ body::before {
 .leaderboard-item.self {
   background: rgba(99, 102, 241, 0.2);
   border: 1px solid var(--accent-primary);
+}
+
+.leaderboard-item-mini {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+}
+
+.leaderboard-item-mini.self {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.leaderboard-item-mini .rank {
+  font-weight: 800;
+  color: var(--accent-primary);
+  width: 1.5rem;
+}
+
+.leaderboard-item-mini .name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leaderboard-item-mini .score {
+  font-family: monospace;
+  color: var(--text-secondary);
 }
 
 .leaderboard-rank {
