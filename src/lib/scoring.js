@@ -17,14 +17,15 @@ export async function saveGameResult(gameMode, won, attempts, timeMs) {
     const today = getTodayDateStr()
 
     try {
-        // Check if already played today for this mode
+        // Check if already played today for this mode (after reset)
         const { data: existing } = await supabase
             .from('game_results')
             .select('id')
             .eq('user_id', user.id)
             .eq('game_mode', gameMode)
             .eq('game_date', today)
-            .single()
+            .gt('created_at', '2026-01-03T00:00:00Z')
+            .maybeSingle()
 
         if (existing) {
             return { error: 'Bugün bu modu zaten oynadınız!' }
@@ -56,25 +57,27 @@ export async function saveGameResult(gameMode, won, attempts, timeMs) {
 
 // Get player's rank for today
 export async function getPlayerRank(gameMode) {
-    const user = getCurrentUser()
-    if (!user) return null
+    const currentUser = getCurrentUser() // Renamed to avoid conflict with internal 'user' variable
+    if (!currentUser) return null
 
     const today = getTodayDateStr()
 
     try {
         // Get all results for today, ordered by won DESC, time ASC
-        const { data: results, error } = await supabase
+        const { data, error } = await supabase
             .from('game_results')
-            .select('user_id, won, time_ms')
+            .select('user_id, won, time_ms') // Changed to include user_id for findIndex
             .eq('game_mode', gameMode)
             .eq('game_date', today)
+            .gt('created_at', '2026-01-03T00:00:00Z') // Added created_at filter
             .order('won', { ascending: false })
             .order('time_ms', { ascending: true })
 
         if (error) throw error
+        if (!data) return null
 
         // Find player's position
-        const playerIndex = results.findIndex(r => r.user_id === user.id)
+        const playerIndex = data.findIndex(r => r.user_id === currentUser.id) // Use currentUser
         if (playerIndex === -1) return null
 
         return playerIndex + 1

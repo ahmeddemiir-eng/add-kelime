@@ -94,7 +94,7 @@ function startRealtimeUpdates() {
 
         liveTickerContent.prepend(item)
 
-        // Refresh daily leaderboard if it s for the current mode
+        // Refresh daily leaderboard if it's for the current mode
         if (scoreData.gameMode === currentMode) {
             loadDailyTop5(currentMode)
         }
@@ -441,12 +441,17 @@ async function handleSubmit() {
             result.timeMs
         )
 
-        if (saveResult.error && !saveResult.error.includes('zaten')) {
-            console.error('Save error:', saveResult.error)
+        if (saveResult.error) {
+            if (!saveResult.error.includes('zaten')) {
+                console.error('Save error:', saveResult.error)
+                showMessage('Sonuç kaydedilemedi: ' + saveResult.error, 'error')
+            } else {
+                showMessage(saveResult.error, 'info')
+            }
         }
 
         // Refresh side leaderboard
-        loadDailyTop5(currentMode)
+        await loadDailyTop5(currentMode)
 
         // Small delay to ensure DB consistency before fetching rank
         await new Promise(resolve => setTimeout(resolve, 500))
