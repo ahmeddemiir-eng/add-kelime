@@ -54,10 +54,23 @@ async function loadUserProfile() {
 
         if (data) {
             currentUser.username = data.username
+        } else {
+            // Profile doesn't exist, create it
+            const username = currentUser.user_metadata?.username || currentUser.email?.split('@')[0] || 'Oyuncu'
+            const { error: insertError } = await supabase
+                .from('profiles')
+                .insert({
+                    id: currentUser.id,
+                    username: username,
+                    email: currentUser.email
+                })
+
+            if (!insertError) {
+                currentUser.username = username
+            }
         }
     } catch (error) {
-        // Profile might not exist yet, that's okay
-        console.log('Profile not found, will be created on first game')
+        console.log('Profile check/creation error:', error)
     }
 }
 

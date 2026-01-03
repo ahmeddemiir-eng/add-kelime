@@ -1095,9 +1095,9 @@ body::before {
   .key {
     flex: 1;
     min-width: unset;
-    height: 62px;
-    font-size: 1.2rem;
-    border-radius: 6px;
+    height: 68px;
+    font-size: 1.3rem;
+    border-radius: 8px;
   }
 
   .key.wide {
