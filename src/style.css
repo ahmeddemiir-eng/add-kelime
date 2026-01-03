@@ -738,7 +738,6 @@ body::before {
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  /* Ensure it's on top of everything */
   padding: 10px;
 }
 
@@ -771,12 +770,18 @@ body::before {
   animation: fadeIn 0.3s ease;
 }
 
+@media (max-width: 768px) {
+  .modal-content {
+    padding: var(--spacing-md);
+    max-height: 95vh;
+  }
+}
+
 .leaderboard-content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-sm);
   -webkit-overflow-scrolling: touch;
-  /* Smooth scroll on iOS */
+  padding-right: 5px;
 }
 
 .modal-header {

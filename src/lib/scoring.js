@@ -89,31 +89,40 @@ export async function getDailyLeaderboard(gameMode, limit = 10, dateStr = null) 
     const today = dateStr || getTodayDateStr()
 
     try {
-        const { data, error } = await supabase
+        // 1. Fetch game results first
+        const { data: results, error: resultsError } = await supabase
             .from('game_results')
-            .select(`
-        user_id,
-        won,
-        attempts,
-        time_ms,
-        profiles(username)
-      `)
+            .select('user_id, won, attempts, time_ms')
             .eq('game_mode', gameMode)
             .eq('game_date', today)
-            .gt('created_at', '2026-01-03T00:00:00Z') // Safer filter to include recent games but exclude old ones
+            .gt('created_at', '2026-01-03T00:00:00Z')
             .order('won', { ascending: false })
             .order('time_ms', { ascending: true })
             .limit(limit)
 
-        if (error) throw error
+        if (resultsError) throw resultsError
+        if (!results || results.length === 0) return []
 
-        // Calculate points for each player
-        return data.map((result, index) => {
-            let username = 'Oyuncu'
-            if (result.profiles) {
-                const profile = Array.isArray(result.profiles) ? result.profiles[0] : result.profiles
-                username = profile?.username || 'Oyuncu'
-            }
+        // 2. Fetch profiles for these users
+        const userIds = [...new Set(results.map(r => r.user_id))]
+        const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, username')
+            .in('id', userIds)
+
+        if (profilesError) console.error('Error fetching profiles:', profilesError)
+
+        // 3. Create a lookup map for usernames
+        const profileMap = {}
+        if (profiles) {
+            profiles.forEach(p => {
+                profileMap[p.id] = p.username
+            })
+        }
+
+        // 4. Merge results with usernames and calculate points
+        return results.map((result, index) => {
+            const username = profileMap[result.user_id] || 'Oyuncu'
             return {
                 rank: index + 1,
                 userId: result.user_id,
@@ -137,16 +146,10 @@ export async function getMonthlyLeaderboard(gameMode, limit = 10) {
     const endDate = `${monthStr}-31` // Approximate end of month
 
     try {
-        // Get all results for the month
-        const { data: monthResults, error } = await supabase
+        // 1. Fetch game results for the month
+        const { data: monthResults, error: resultsError } = await supabase
             .from('game_results')
-            .select(`
-        user_id,
-        won,
-        time_ms,
-        game_date,
-        profiles(username)
-      `)
+            .select('user_id, won, time_ms, game_date')
             .eq('game_mode', gameMode)
             .gte('game_date', startDate)
             .lte('game_date', endDate)
@@ -155,9 +158,22 @@ export async function getMonthlyLeaderboard(gameMode, limit = 10) {
             .order('won', { ascending: false })
             .order('time_ms', { ascending: true })
 
-        if (error) throw error
+        if (resultsError) throw resultsError
+        if (!monthResults || monthResults.length === 0) return []
 
-        // Group by date and calculate daily ranks
+        // 2. Fetch profiles for these users
+        const userIds = [...new Set(monthResults.map(r => r.user_id))]
+        const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, username')
+            .in('id', userIds)
+
+        const profileMap = {}
+        if (profiles) {
+            profiles.forEach(p => profileMap[p.id] = p.username)
+        }
+
+        // 3. Group by date and calculate daily ranks
         const dailyResults = {}
         monthResults.forEach(result => {
             if (!dailyResults[result.game_date]) {
@@ -166,34 +182,27 @@ export async function getMonthlyLeaderboard(gameMode, limit = 10) {
             dailyResults[result.game_date].push(result)
         })
 
-        // Calculate total points per user
+        // 4. Calculate total points per user
         const userPoints = {}
-        const usernames = {}
 
         Object.entries(dailyResults).forEach(([date, results]) => {
             results.forEach((result, index) => {
                 const points = calculatePoints(index + 1, gameMode, result.won)
                 if (!userPoints[result.user_id]) {
                     userPoints[result.user_id] = 0
-                    let username = 'Anonim'
-                    if (result.profiles) {
-                        const profile = Array.isArray(result.profiles) ? result.profiles[0] : result.profiles
-                        username = profile?.username || 'Oyuncu'
-                    }
-                    usernames[result.user_id] = username
                 }
                 userPoints[result.user_id] += points
             })
         })
 
-        // Sort by total points
+        // 5. Sort by total points
         const sortedUsers = Object.entries(userPoints)
             .sort(([, a], [, b]) => b - a)
             .slice(0, limit)
             .map(([userId, points], index) => ({
                 rank: index + 1,
                 userId,
-                username: usernames[userId],
+                username: profileMap[userId] || 'Oyuncu',
                 totalPoints: points
             }))
 
@@ -207,25 +216,32 @@ export async function getMonthlyLeaderboard(gameMode, limit = 10) {
 // Get all-time leaderboard (aggregated points)
 export async function getAllTimeLeaderboard(gameMode, limit = 10) {
     try {
-        // Get all results ever
-        const { data: allResults, error } = await supabase
+        // 1. Fetch all game results
+        const { data: allResults, error: resultsError } = await supabase
             .from('game_results')
-            .select(`
-        user_id,
-        won,
-        time_ms,
-        game_date,
-        profiles(username)
-      `)
+            .select('user_id, won, time_ms, game_date')
             .eq('game_mode', gameMode)
             .gt('created_at', '2026-01-03T00:00:00Z')
             .order('game_date')
             .order('won', { ascending: false })
             .order('time_ms', { ascending: true })
 
-        if (error) throw error
+        if (resultsError) throw resultsError
+        if (!allResults || allResults.length === 0) return []
 
-        // Group by date and calculate daily ranks
+        // 2. Fetch profiles for these users
+        const userIds = [...new Set(allResults.map(r => r.user_id))]
+        const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, username')
+            .in('id', userIds)
+
+        const profileMap = {}
+        if (profiles) {
+            profiles.forEach(p => profileMap[p.id] = p.username)
+        }
+
+        // 3. Group by date and calculate daily ranks
         const dailyResults = {}
         allResults.forEach(result => {
             if (!dailyResults[result.game_date]) {
@@ -234,33 +250,27 @@ export async function getAllTimeLeaderboard(gameMode, limit = 10) {
             dailyResults[result.game_date].push(result)
         })
 
-        // Calculate total points per user
+        // 4. Calculate total points per user
         const userPoints = {}
-        const usernames = {}
 
         Object.entries(dailyResults).forEach(([date, results]) => {
             results.forEach((result, index) => {
                 const points = calculatePoints(index + 1, gameMode, result.won)
                 if (!userPoints[result.user_id]) {
                     userPoints[result.user_id] = 0
-                    let username = 'Anonim'
-                    if (result.profiles) {
-                        username = Array.isArray(result.profiles) ? result.profiles[0]?.username : result.profiles.username
-                    }
-                    usernames[result.user_id] = username || 'Oyuncu'
                 }
                 userPoints[result.user_id] += points
             })
         })
 
-        // Sort by total points
+        // 5. Sort by total points
         const sortedUsers = Object.entries(userPoints)
             .sort(([, a], [, b]) => b - a)
             .slice(0, limit)
             .map(([userId, points], index) => ({
                 rank: index + 1,
                 userId,
-                username: usernames[userId],
+                username: profileMap[userId] || 'Oyuncu',
                 totalPoints: points
             }))
 
