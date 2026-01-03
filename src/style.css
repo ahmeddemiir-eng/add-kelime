@@ -1135,21 +1135,13 @@ body::before {
 
 /* ===== Live Ticker ===== */
 .live-ticker {
-  position: fixed;
-  right: 20px;
-  top: 100px;
-  width: 250px;
+  width: 100%;
   background: var(--bg-card);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-md);
-  z-index: 100;
+  border-radius: var(--radius-xl);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  max-height: 400px;
-  overflow: hidden;
+  max-height: 300px;
 }
 
 .live-ticker-title {

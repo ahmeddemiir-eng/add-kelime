@@ -96,7 +96,7 @@ export async function getDailyLeaderboard(gameMode, limit = 10, dateStr = null) 
         won,
         attempts,
         time_ms,
-        profiles(username)
+        profiles!inner(username)
       `)
             .eq('game_mode', gameMode)
             .eq('game_date', today)
@@ -107,15 +107,18 @@ export async function getDailyLeaderboard(gameMode, limit = 10, dateStr = null) 
         if (error) throw error
 
         // Calculate points for each player
-        return data.map((result, index) => ({
-            rank: index + 1,
-            userId: result.user_id,
-            username: result.profiles?.username || 'Anonim',
-            won: result.won,
-            attempts: result.attempts,
-            timeMs: result.time_ms,
-            points: calculatePoints(index + 1, gameMode, result.won)
-        }))
+        return data.map((result, index) => {
+            const profile = Array.isArray(result.profiles) ? result.profiles[0] : result.profiles
+            return {
+                rank: index + 1,
+                userId: result.user_id,
+                username: profile?.username || 'Anonim',
+                won: result.won,
+                attempts: result.attempts,
+                timeMs: result.time_ms,
+                points: calculatePoints(index + 1, gameMode, result.won)
+            }
+        })
     } catch (error) {
         console.error('Error getting daily leaderboard:', error)
         return []
@@ -137,7 +140,7 @@ export async function getMonthlyLeaderboard(gameMode, limit = 10) {
         won,
         time_ms,
         game_date,
-        profiles(username)
+        profiles!inner(username)
       `)
             .eq('game_mode', gameMode)
             .gte('game_date', startDate)
@@ -166,7 +169,8 @@ export async function getMonthlyLeaderboard(gameMode, limit = 10) {
                 const points = calculatePoints(index + 1, gameMode, result.won)
                 if (!userPoints[result.user_id]) {
                     userPoints[result.user_id] = 0
-                    usernames[result.user_id] = result.profiles?.username || 'Anonim'
+                    const profile = Array.isArray(result.profiles) ? result.profiles[0] : result.profiles
+                    usernames[result.user_id] = profile?.username || 'Anonim'
                 }
                 userPoints[result.user_id] += points
             })
@@ -201,7 +205,7 @@ export async function getAllTimeLeaderboard(gameMode, limit = 10) {
         won,
         time_ms,
         game_date,
-        profiles(username)
+        profiles!inner(username)
       `)
             .eq('game_mode', gameMode)
             .order('game_date')
@@ -228,7 +232,8 @@ export async function getAllTimeLeaderboard(gameMode, limit = 10) {
                 const points = calculatePoints(index + 1, gameMode, result.won)
                 if (!userPoints[result.user_id]) {
                     userPoints[result.user_id] = 0
-                    usernames[result.user_id] = result.profiles?.username || 'Anonim'
+                    const profile = Array.isArray(result.profiles) ? result.profiles[0] : result.profiles
+                    usernames[result.user_id] = profile?.username || 'Anonim'
                 }
                 userPoints[result.user_id] += points
             })
