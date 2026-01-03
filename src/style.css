@@ -856,11 +856,12 @@ body::before {
 .leaderboard-item-mini {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  gap: 8px;
+  padding: 8px 10px;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  width: 100%;
 }
 
 .leaderboard-item-mini.self {
@@ -871,7 +872,8 @@ body::before {
 .leaderboard-item-mini .rank {
   font-weight: 800;
   color: var(--accent-primary);
-  width: 1.5rem;
+  width: 20px;
+  flex-shrink: 0;
 }
 
 .leaderboard-item-mini .name {
@@ -879,21 +881,24 @@ body::before {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .leaderboard-item-mini .points {
   font-weight: 700;
   color: var(--accent-secondary);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   background: rgba(139, 92, 246, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
+  flex-shrink: 0;
 }
 
 .leaderboard-item-mini .score {
   font-family: monospace;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  flex-shrink: 0;
 }
 
 .leaderboard-rank {

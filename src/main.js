@@ -448,6 +448,9 @@ async function handleSubmit() {
         // Refresh side leaderboard
         loadDailyTop5(currentMode)
 
+        // Small delay to ensure DB consistency before fetching rank
+        await new Promise(resolve => setTimeout(resolve, 500))
+
         // Get rank
         const rank = await getPlayerRank(currentMode)
         const points = rank ? calculatePoints(rank, currentMode, result.won) : 0
