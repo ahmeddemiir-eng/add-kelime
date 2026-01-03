@@ -881,9 +881,19 @@ body::before {
   text-overflow: ellipsis;
 }
 
+.leaderboard-item-mini .points {
+  font-weight: 700;
+  color: var(--accent-secondary);
+  font-size: 0.8rem;
+  background: rgba(139, 92, 246, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
 .leaderboard-item-mini .score {
   font-family: monospace;
-  color: var(--text-secondary);
+  color: var(--text-muted);
+  font-size: 0.75rem;
 }
 
 .leaderboard-rank {

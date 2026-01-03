@@ -4,14 +4,9 @@ import { getTodayDateStr, getCurrentMonthStr } from '../data/words.js'
 
 // Calculate points based on rank and game mode
 export function calculatePoints(rank, gameMode, won) {
-    if (!won) {
-        // Even if they didn't win, they get points based on completion order
-        // This is handled by the position, not won status
-    }
-
-    const maxPoints = gameMode // 5, 6, or 7 points for 1st place
-    const points = Math.max(0, maxPoints - rank + 1)
-    return points
+    if (!won) return 0
+    const basePoints = Number(gameMode)
+    return Math.max(1, basePoints - rank + 1)
 }
 
 // Save game result to Supabase

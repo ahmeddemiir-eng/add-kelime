@@ -122,6 +122,7 @@ async function loadDailyTop5(mode) {
             <div class="leaderboard-item-mini ${isSelf ? 'self' : ''}">
                 <span class="rank">${index + 1}</span>
                 <span class="name">${item.username}</span>
+                <span class="points">${item.points} Puan</span>
                 <span class="score">${formatTime(item.timeMs)}</span>
             </div>
         `
