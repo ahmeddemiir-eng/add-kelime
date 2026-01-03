@@ -90,8 +90,8 @@ export async function getPlayerRank(gameMode) {
 }
 
 // Get daily leaderboard
-export async function getDailyLeaderboard(gameMode, limit = 10) {
-    const today = getTodayDateStr()
+export async function getDailyLeaderboard(gameMode, limit = 10, dateStr = null) {
+    const today = dateStr || getTodayDateStr()
 
     try {
         const { data, error } = await supabase

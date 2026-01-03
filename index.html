@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AdD KELİME - Türkçe rekabetçi kelime bulmaca oyunu. Günlük kelimeyi bul, sıralamada yüksel!">
+  <meta name="description"
+    content="AdD KELİME - Türkçe rekabetçi kelime bulmaca oyunu. Günlük kelimeyi bul, sıralamada yüksel!">
   <title>AdD KELİME - Türkçe Kelime Oyunu</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css">
 </head>
+
 <body>
   <div id="app">
     <!-- Auth Screen -->
@@ -17,15 +20,15 @@
       <div class="auth-container">
         <div class="logo-section">
           <h1 class="logo">AdD <span class="highlight">KELİME</span></h1>
-          <p class="tagline">Türkçe Rekabetçi Kelime Oyunu</p>
+          <p class="tagline">Bu oyun bir AdD yapımıdır.</p>
         </div>
-        
+
         <div class="auth-card glass-card">
           <div class="auth-tabs">
             <button class="auth-tab active" data-tab="login">Giriş Yap</button>
             <button class="auth-tab" data-tab="register">Kayıt Ol</button>
           </div>
-          
+
           <!-- Login Form -->
           <form id="login-form" class="auth-form active">
             <div class="form-group">
@@ -39,7 +42,7 @@
             <button type="submit" class="btn btn-primary">Giriş Yap</button>
             <div id="login-error" class="error-message"></div>
           </form>
-          
+
           <!-- Register Form -->
           <form id="register-form" class="auth-form">
             <div class="form-group">
@@ -112,6 +115,14 @@
           <!-- Keyboard will be generated dynamically -->
         </div>
       </main>
+
+      <!-- Live Ticker (Desktop Side / Mobile Top) -->
+      <div id="live-ticker" class="live-ticker">
+        <div class="live-ticker-title">Canlı Skorlar 🔴</div>
+        <div id="live-ticker-content" class="live-ticker-content">
+          <!-- Live items will be added here -->
+        </div>
+      </div>
     </div>
 
     <!-- Leaderboard Modal -->
@@ -125,6 +136,9 @@
         <div class="leaderboard-tabs">
           <button class="lb-tab active" data-period="daily">Günlük</button>
           <button class="lb-tab" data-period="monthly">Aylık</button>
+        </div>
+        <div class="leaderboard-controls">
+          <input type="date" id="leaderboard-date" class="date-picker">
         </div>
         <div class="leaderboard-mode-tabs">
           <button class="lb-mode-tab active" data-mode="5">5 Harf</button>
@@ -168,8 +182,10 @@
 
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
+    <div style="position: fixed; bottom: 5px; right: 5px; font-size: 10px; opacity: 0.5; color: white;">v1.1</div>
   </div>
 
   <script type="module" src="/src/main.js"></script>
 </body>
+
 </html>

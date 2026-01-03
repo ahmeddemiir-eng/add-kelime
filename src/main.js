@@ -3,6 +3,8 @@ import './style.css'
 import { initAuth, register, login, logout, getCurrentUser, getUserDisplayName, isLoggedIn } from './lib/auth.js'
 import { initGame, addLetter, removeLetter, submitGuess, getGameState, getKeyboardState, formatTime, getElapsedTime, startTimer, isGameOver, hasWon, getTargetWord, getAttempts, getCurrentGuess, getGuesses, getMaxAttempts } from './lib/game.js'
 import { saveGameResult, getDailyLeaderboard, getMonthlyLeaderboard, getPlayerRank, hasPlayedToday, calculatePoints } from './lib/scoring.js'
+import { subscribeToLiveScores, unsubscribeFromLiveScores } from './lib/realtime.js'
+import { getTodayDateStr } from './data/words.js'
 
 // Turkish keyboard layout
 const KEYBOARD_ROWS = [
@@ -34,6 +36,8 @@ const leaderboardBtn = document.getElementById('leaderboard-btn')
 const leaderboardModal = document.getElementById('leaderboard-modal')
 const leaderboardContent = document.getElementById('leaderboard-content')
 const resultModal = document.getElementById('result-modal')
+const liveTickerContent = document.getElementById('live-ticker-content')
+const leaderboardDateInput = document.getElementById('leaderboard-date')
 
 // Initialize the application
 async function init() {
@@ -50,6 +54,7 @@ async function init() {
         showGameScreen()
         await checkPlayedModes()
         startGame(currentMode)
+        startRealtimeUpdates()
     } else {
         showAuthScreen()
     }
@@ -71,6 +76,28 @@ async function init() {
 
     // Setup modals
     setupModals()
+}
+
+function startRealtimeUpdates() {
+    subscribeToLiveScores((scoreData) => {
+        // Only show if won
+        if (!scoreData.won) return
+
+        const item = document.createElement('div')
+        item.className = 'live-item'
+        item.innerHTML = `
+            <span class="highlight-user">${scoreData.username}</span> 
+            ${scoreData.gameMode} harfliyi 
+            <span class="time">${formatTime(scoreData.timeMs)}</span> sürede bildi!
+        `
+
+        liveTickerContent.prepend(item)
+
+        // Remove old items if too many
+        if (liveTickerContent.children.length > 10) {
+            liveTickerContent.lastElementChild.remove()
+        }
+    })
 }
 
 function setupAuthTabs() {
@@ -110,6 +137,7 @@ function setupAuthForms() {
         showGameScreen()
         await checkPlayedModes()
         startGame(currentMode)
+        startRealtimeUpdates()
     })
 
     registerForm.addEventListener('submit', async (e) => {
@@ -149,6 +177,7 @@ function showAuthScreen() {
     authScreen.classList.add('active')
     gameScreen.classList.remove('active')
     stopTimer()
+    unsubscribeFromLiveScores()
 }
 
 function showGameScreen() {
@@ -502,9 +531,24 @@ function showResultModal(won, attempts, timeMs, rank, points, correctWord) {
 }
 
 function setupLeaderboard() {
+    // Set default date to today
+    leaderboardDateInput.value = getTodayDateStr()
+
     leaderboardBtn.addEventListener('click', () => {
         leaderboardModal.classList.add('active')
-        loadLeaderboard('daily', currentMode)
+        const activeMode = parseInt(document.querySelector('.lb-mode-tab.active').dataset.mode)
+        const activePeriod = document.querySelector('.lb-tab.active').dataset.period
+        loadLeaderboard(activePeriod, activeMode, leaderboardDateInput.value)
+    })
+
+    // Date picker change
+    leaderboardDateInput.addEventListener('change', () => {
+        const activeMode = parseInt(document.querySelector('.lb-mode-tab.active').dataset.mode)
+        const activePeriod = document.querySelector('.lb-tab.active').dataset.period
+        // Only reload if daily tab is active, as monthly ignores date picker
+        if (activePeriod === 'daily') {
+            loadLeaderboard(activePeriod, activeMode, leaderboardDateInput.value)
+        }
     })
 
     // Period tabs
@@ -514,7 +558,15 @@ function setupLeaderboard() {
             tab.classList.add('active')
             const period = tab.dataset.period
             const activeMode = parseInt(document.querySelector('.lb-mode-tab.active').dataset.mode)
-            loadLeaderboard(period, activeMode)
+
+            // Show/Hide date picker based on period
+            if (period === 'monthly') {
+                leaderboardDateInput.style.display = 'none'
+            } else {
+                leaderboardDateInput.style.display = 'block'
+            }
+
+            loadLeaderboard(period, activeMode, leaderboardDateInput.value)
         })
     })
 
@@ -525,17 +577,17 @@ function setupLeaderboard() {
             tab.classList.add('active')
             const mode = parseInt(tab.dataset.mode)
             const activePeriod = document.querySelector('.lb-tab.active').dataset.period
-            loadLeaderboard(activePeriod, mode)
+            loadLeaderboard(activePeriod, mode, leaderboardDateInput.value)
         })
     })
 }
 
-async function loadLeaderboard(period, mode) {
+async function loadLeaderboard(period, mode, dateStr = null) {
     leaderboardContent.innerHTML = '<div class="leaderboard-empty">Yükleniyor...</div>'
 
     let data
     if (period === 'daily') {
-        data = await getDailyLeaderboard(mode)
+        data = await getDailyLeaderboard(mode, 10, dateStr)
     } else {
         data = await getMonthlyLeaderboard(mode)
     }
