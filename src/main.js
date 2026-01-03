@@ -2,7 +2,7 @@
 import './style.css'
 import { initAuth, register, login, logout, getCurrentUser, getUserDisplayName, isLoggedIn } from './lib/auth.js'
 import { initGame, addLetter, removeLetter, submitGuess, getGameState, getKeyboardState, formatTime, getElapsedTime, startTimer, isGameOver, hasWon, getTargetWord, getAttempts, getCurrentGuess, getGuesses, getMaxAttempts } from './lib/game.js'
-import { saveGameResult, getDailyLeaderboard, getMonthlyLeaderboard, getPlayerRank, hasPlayedToday, calculatePoints } from './lib/scoring.js'
+import { saveGameResult, getDailyLeaderboard, getMonthlyLeaderboard, getAllTimeLeaderboard, getPlayerRank, hasPlayedToday, calculatePoints } from './lib/scoring.js'
 import { subscribeToLiveScores, unsubscribeFromLiveScores } from './lib/realtime.js'
 import { getTodayDateStr } from './data/words.js'
 
@@ -560,10 +560,10 @@ function setupLeaderboard() {
             const activeMode = parseInt(document.querySelector('.lb-mode-tab.active').dataset.mode)
 
             // Show/Hide date picker based on period
-            if (period === 'monthly') {
-                leaderboardDateInput.style.display = 'none'
-            } else {
+            if (period === 'daily') {
                 leaderboardDateInput.style.display = 'block'
+            } else {
+                leaderboardDateInput.style.display = 'none'
             }
 
             loadLeaderboard(period, activeMode, leaderboardDateInput.value)
@@ -588,8 +588,10 @@ async function loadLeaderboard(period, mode, dateStr = null) {
     let data
     if (period === 'daily') {
         data = await getDailyLeaderboard(mode, 10, dateStr)
-    } else {
+    } else if (period === 'monthly') {
         data = await getMonthlyLeaderboard(mode)
+    } else {
+        data = await getAllTimeLeaderboard(mode)
     }
 
     if (data.length === 0) {

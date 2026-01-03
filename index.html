@@ -133,56 +133,56 @@
           <h2>🏆 Liderlik Tablosu</h2>
           <button class="modal-close">&times;</button>
         </div>
-        <div class="leaderboard-tabs">
-          <button class="lb-tab active" data-period="daily">Günlük</button>
-          <button class="lb-tab" data-period="monthly">Aylık</button>
-        </div>
-        <div class="leaderboard-controls">
-          <input type="date" id="leaderboard-date" class="date-picker">
-        </div>
-        <div class="leaderboard-mode-tabs">
-          <button class="lb-mode-tab active" data-mode="5">5 Harf</button>
-          <button class="lb-mode-tab" data-mode="6">6 Harf</button>
-          <button class="lb-mode-tab" data-mode="7">7 Harf</button>
-        </div>
-        <div id="leaderboard-content" class="leaderboard-content">
-          <!-- Leaderboard data will be loaded here -->
-        </div>
+        <button class="lb-tab active" data-period="daily">Günlük</button>
+        <button class="lb-tab" data-period="monthly">Aylık</button>
+        <button class="lb-tab" data-period="alltime">Tüm Zamanlar</button>
+      </div>
+      <div class="leaderboard-controls">
+        <input type="date" id="leaderboard-date" class="date-picker">
+      </div>
+      <div class="leaderboard-mode-tabs">
+        <button class="lb-mode-tab active" data-mode="5">5 Harf</button>
+        <button class="lb-mode-tab" data-mode="6">6 Harf</button>
+        <button class="lb-mode-tab" data-mode="7">7 Harf</button>
+      </div>
+      <div id="leaderboard-content" class="leaderboard-content">
+        <!-- Leaderboard data will be loaded here -->
       </div>
     </div>
+  </div>
 
-    <!-- Result Modal -->
-    <div id="result-modal" class="modal">
-      <div class="modal-overlay"></div>
-      <div class="modal-content glass-card result-modal-content">
-        <div id="result-icon" class="result-icon"></div>
-        <h2 id="result-title" class="result-title"></h2>
-        <p id="result-word" class="result-word"></p>
-        <div class="result-stats">
-          <div class="stat">
-            <span class="stat-value" id="result-attempts"></span>
-            <span class="stat-label">Deneme</span>
-          </div>
-          <div class="stat">
-            <span class="stat-value" id="result-time"></span>
-            <span class="stat-label">Süre</span>
-          </div>
-          <div class="stat">
-            <span class="stat-value" id="result-rank"></span>
-            <span class="stat-label">Sıralama</span>
-          </div>
-          <div class="stat">
-            <span class="stat-value" id="result-points"></span>
-            <span class="stat-label">Puan</span>
-          </div>
+  <!-- Result Modal -->
+  <div id="result-modal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content glass-card result-modal-content">
+      <div id="result-icon" class="result-icon"></div>
+      <h2 id="result-title" class="result-title"></h2>
+      <p id="result-word" class="result-word"></p>
+      <div class="result-stats">
+        <div class="stat">
+          <span class="stat-value" id="result-attempts"></span>
+          <span class="stat-label">Deneme</span>
         </div>
-        <button id="result-close" class="btn btn-primary">Tamam</button>
+        <div class="stat">
+          <span class="stat-value" id="result-time"></span>
+          <span class="stat-label">Süre</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="result-rank"></span>
+          <span class="stat-label">Sıralama</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="result-points"></span>
+          <span class="stat-label">Puan</span>
+        </div>
       </div>
+      <button id="result-close" class="btn btn-primary">Tamam</button>
     </div>
+  </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="toast-container"></div>
-    <div style="position: fixed; bottom: 5px; right: 5px; font-size: 10px; opacity: 0.5; color: white;">v1.1</div>
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+  <div style="position: fixed; bottom: 5px; right: 5px; font-size: 10px; opacity: 0.5; color: white;">v1.1</div>
   </div>
 
   <script type="module" src="/src/main.js"></script>

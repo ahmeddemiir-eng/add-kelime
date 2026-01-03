@@ -195,6 +195,68 @@ export async function getMonthlyLeaderboard(gameMode, limit = 10) {
     }
 }
 
+// Get all-time leaderboard (aggregated points)
+export async function getAllTimeLeaderboard(gameMode, limit = 10) {
+    try {
+        // Get all results ever
+        const { data: allResults, error } = await supabase
+            .from('game_results')
+            .select(`
+        user_id,
+        won,
+        time_ms,
+        game_date,
+        profiles!inner(username)
+      `)
+            .eq('game_mode', gameMode)
+            .order('game_date')
+            .order('won', { ascending: false })
+            .order('time_ms', { ascending: true })
+
+        if (error) throw error
+
+        // Group by date and calculate daily ranks
+        const dailyResults = {}
+        allResults.forEach(result => {
+            if (!dailyResults[result.game_date]) {
+                dailyResults[result.game_date] = []
+            }
+            dailyResults[result.game_date].push(result)
+        })
+
+        // Calculate total points per user
+        const userPoints = {}
+        const usernames = {}
+
+        Object.entries(dailyResults).forEach(([date, results]) => {
+            results.forEach((result, index) => {
+                const points = calculatePoints(index + 1, gameMode, result.won)
+                if (!userPoints[result.user_id]) {
+                    userPoints[result.user_id] = 0
+                    usernames[result.user_id] = result.profiles?.username || 'Anonim'
+                }
+                userPoints[result.user_id] += points
+            })
+        })
+
+        // Sort by total points
+        const sortedUsers = Object.entries(userPoints)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, limit)
+            .map(([userId, points], index) => ({
+                rank: index + 1,
+                userId,
+                username: usernames[userId],
+                totalPoints: points
+            }))
+
+        return sortedUsers
+    } catch (error) {
+        console.error('Error getting all-time leaderboard:', error)
+        return []
+    }
+}
+
 // Check if player has played today
 export async function hasPlayedToday(gameMode) {
     const user = getCurrentUser()
