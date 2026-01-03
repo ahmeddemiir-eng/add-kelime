@@ -1095,11 +1095,9 @@ body::before {
   .key {
     flex: 1;
     min-width: unset;
-    /* Allow flex to handle width */
-    height: 56px;
-    /* Taller keys for easier tapping */
-    font-size: 1rem;
-    border-radius: 4px;
+    height: 62px;
+    font-size: 1.2rem;
+    border-radius: 6px;
   }
 
   .key.wide {
