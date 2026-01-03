@@ -84,9 +84,10 @@ const VALID_WORDS_6 = new Set(WORDS_6)
 const VALID_WORDS_7 = new Set(WORDS_7)
 
 export function getWordList(mode) {
-    if (mode === 5) return WORDS_5
-    if (mode === 6) return WORDS_6
-    if (mode === 7) return WORDS_7
+    const m = Number(mode)
+    if (m === 5) return WORDS_5
+    if (m === 6) return WORDS_6
+    if (m === 7) return WORDS_7
     return WORDS_5
 }
 
