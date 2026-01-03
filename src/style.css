@@ -737,8 +737,9 @@ body::before {
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: var(--spacing-lg);
+  z-index: 2000;
+  /* Higher than side panel */
+  padding: 10px;
 }
 
 .modal.active {
@@ -751,18 +752,27 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
 }
 
 .modal-content {
   position: relative;
   width: 100%;
-  max-width: 450px;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding: var(--spacing-xl);
+  max-width: 500px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-lg);
+  overflow: hidden;
+  /* Let children handle scrolling */
   animation: fadeIn 0.3s ease;
+}
+
+.leaderboard-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
 }
 
 .modal-header {
