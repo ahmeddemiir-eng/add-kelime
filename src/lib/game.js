@@ -83,7 +83,7 @@ export function submitGuess() {
     }
 
     // Validate word exists in dictionary
-    if (!isValidWord(gameState.currentGuess.toLowerCase(), gameState.mode)) {
+    if (!isValidWord(gameState.currentGuess, gameState.mode)) {
         return { success: false, error: 'Bu kelime sözlükte yok!' }
     }
 

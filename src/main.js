@@ -229,6 +229,7 @@ async function checkPlayedModes() {
 
 function startGame(mode) {
     stopTimer()
+    initGame(mode)
 
     if (alreadyPlayed[mode]) {
         showMessage('Bu modu bugün zaten oynadınız!', 'error')
@@ -238,7 +239,6 @@ function startGame(mode) {
         return
     }
 
-    initGame(mode)
     renderBoard()
     renderKeyboard()
     timerEl.textContent = '00:00.000'
